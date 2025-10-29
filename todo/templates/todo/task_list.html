@@ -32,9 +32,9 @@
         </td>
         <td>
           {% if task.done %}
-            ✅ Done
+            Done
           {% else %}
-            ⏳ Pending
+            Not done
           {% endif %}
         </td>
         <td>
@@ -46,6 +46,17 @@
             <span class="text-muted">No tags</span>
           {% endif %}
         </td>
+          <td>
+              <form action="{% url 'todo:toggle_task_status' pk=task.id %}"
+                    method="post" style="display:inline;">
+                        {% csrf_token %}
+                        {% if task.done %}
+                            <button type="submit" class="btn btn-secondary btn-sm">Undo</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-success btn-sm">Complete</button>
+                        {% endif %}
+                    </form>
+          </td>
         <td>
           <a href="{% url 'todo:task-update' pk=task.id %}" class="btn btn-sm btn-primary">
             Update

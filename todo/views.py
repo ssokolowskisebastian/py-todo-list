@@ -1,5 +1,6 @@
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views import generic
+from django.views import generic, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from todo.forms import TaskForm, TagForm
@@ -10,13 +11,6 @@ class TaskListView(generic.ListView):
     model = Task
     context_object_name = "task_list"
     template_name = "todo/task_list.html"
-    paginate_by = 5
-
-
-class TagListView(generic.ListView):
-    model = Tag
-    context_object_name = "tag_list"
-    template_name = "todo/tag_list.html"
     paginate_by = 5
 
 
@@ -37,6 +31,13 @@ class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy("todo:task-list")
 
 
+class TagListView(generic.ListView):
+    model = Tag
+    context_object_name = "tag_list"
+    template_name = "todo/tag_list.html"
+    paginate_by = 5
+
+
 class TagCreateView(LoginRequiredMixin, generic.CreateView):
     model = Tag
     form_class = TagForm
@@ -52,3 +53,16 @@ class TagUpdateView(LoginRequiredMixin, generic.UpdateView):
 class TagDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Tag
     success_url = reverse_lazy("todo:tag-list")
+
+
+class TaskToggleStatusView(View):
+    @staticmethod
+    def toggle_task_status(request, pk):
+        task = Task.objects.get(id=pk)
+        if task.done:
+            task.done = False
+        else:
+            task.done = True
+
+        task.save()
+        return HttpResponseRedirect(reverse_lazy("todo:task-list"))
